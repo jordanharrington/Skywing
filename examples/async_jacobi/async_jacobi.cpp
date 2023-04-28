@@ -71,7 +71,6 @@ void machine_task(
     std::vector<std::string> tag_ids,
     std::string save_directory)
 {
-
   skywing::Manager manager{ports[machine_number], machine_names[machine_number]};
 
   manager.submit_job("job", [&](skywing::Job& job, ManagerHandle manager_handle) {

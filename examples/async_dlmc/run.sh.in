@@ -1,0 +1,44 @@
+#!/bin/bash
+
+#This is a shell script which calls async_dlmc
+
+if [[ $# < 1 ]]; then
+  echo "usage: source $(basename ${BASH_SOURCE[0]}) starting_port_number"
+  return
+fi
+
+STARTING_PORT=$1
+
+# For this example, the number of rows in the matrix corresponds to the size of the network.
+# size_of_network=4
+# matrix_name="toy.mtx"
+size_of_network=4
+number_of_iterations=10
+
+trap kill_progs EXIT
+kill_progs() {
+  for (( counter_for_network_elements=0 ;  counter_for_network_elements < size_of_network ; counter_for_network_elements++ ))
+  do
+      var="erase${counter_for_network_elements}"
+    kill -9 ${!var} > /dev/null 2> /dev/null
+  done
+}
+
+# # Directory where skyent agents load their information
+# system_directory="../../../examples/async_dlmc/system"
+
+# python3 ../../../examples/async_dlmc/dlmc_pre_processing.py "$0" "$10" ${size_of_network} ${system_directory} 
+
+echo -e Asyn DLMC: number of distribution divisions: ${size_of_network} '\t'  real theta: 10
+
+for (( counter_for_iterations = 1 ; counter_for_iterations <= number_of_iterations ; counter_for_iterations++ ))
+do
+    for (( counter_for_network_elements=0 ;  counter_for_network_elements < size_of_network ; counter_for_network_elements++ ))
+    do
+      "@async_dlmc_exe@" ${counter_for_network_elements} ${STARTING_PORT} ${size_of_network} ${counter_for_iterations} &
+      declare "erase${counter_for_network_elements}=$!"
+    done
+    sleep 10
+    kill_progs
+    STARTING_PORT=$((STARTING_PORT+size_of_network+100))
+done
