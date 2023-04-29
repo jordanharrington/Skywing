@@ -13,8 +13,7 @@ def generate_dist_matrix(theta, sigma, network_size):
 theta = float(sys.argv[1])
 sigma = float(sys.argv[2])
 network_size = int(sys.argv[3])
-name_of_system = sys.argv[4]
-system_hold_folder = sys.argv[5]
+system_hold_folder = sys.argv[4]
 
 distributions = generate_dist_matrix(theta, sigma, network_size)
 mmwrite(system_hold_folder + "/dist_matrix.mtx", distributions)
