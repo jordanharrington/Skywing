@@ -26,7 +26,7 @@ system_hold_folder = sys.argv[4]
 np.set_printoptions(suppress=True)
 
 distributions = generate_dist_matrix(theta, sigma, network_size)
-MMFileFixedFormat().write(system_hold_folder + "/dist_matrix.mtx", distributions, precision=5)
+mmwrite(system_hold_folder + "dist_matrix.mtx", distributions)
 
 
 
