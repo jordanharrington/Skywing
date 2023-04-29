@@ -11,24 +11,8 @@ namespace skywing
 {
 
 /** 
- * @brief A Processor used in an IterativeMethod for solving square linear systems of equations Ax=b.
+ * @brief 
  *
- * This processor applies the Jacobi update method. Convergence is
- * guaranteed when the matrix A is square and strictly diagonally
- * dominant. This class stores the full solution vector x_iter at each
- * machine as well as the partition of x_iter corresponding to the
- * partition Ax=b that each machine is responsible for updating.
- * 
- * This processor supports overlapping computations, nonuniform
- * partitioning, and non-sequential partitioning of the linear
- * system. This is why the row_index for each component of x must be
- * sent along with every method for proper processing.
- * 
- * @tparam E The matrix and vector element type to be used. Most often
- * a scalar type such as @p double, but could also be more complex
- * types. For example, if E is a matrix type with proper operator
- * overloading, this processor can be used to implement a block Jacobi
- * method.
 */
 template<typename E = double>
 class DLMCProcessor
@@ -76,7 +60,7 @@ public:
   {
     mailbox_[0] = 0.0;
     mailbox_[1] = 0.0;
-    double num_nbrs = 0.0
+    num_nbrs_ = 0.0
     for (const auto& pTag : nbr_data_handler.get_updated_tags())
     {
       ValueType nbr_value = nbr_data_handler.get_data_unsafe(*pTag);
@@ -88,25 +72,13 @@ public:
       // which is easier to do without iterators.
       for(size_t nbr_vals_ind = 0; nbr_vals_ind < (nbr_value.size()/2); nbr_vals_ind++)
       {
-        bool use_this_value = true;
-        // Cycles through individual values in row_index to avoid
-        // replacing its own updates if there's overlap in the
-        // linear system partition.
-        for(size_t row_index_cycle = 0 ; row_index_cycle < 2; row_index_cycle++)
-        {
-          if(nbr_value[nbr_vals_ind*2] == row_indices_[row_index_cycle])
-            use_this_value = false;
-        }
-        if(use_this_value)
-        {
-          size_t updated_index = static_cast<size_t>(nbr_value[nbr_vals_ind * 2]);
-          mailbox_[nbr_value[nbr_vals_ind*2]] += nbr_value[nbr_vals_ind * 2 + 1];
-          num_nbrs += 1;
-        }
+        size_t updated_index = static_cast<size_t>(nbr_value[nbr_vals_ind * 2]);
+        mailbox_[nbr_value[nbr_vals_ind*2]] += nbr_value[nbr_vals_ind * 2 + 1];
       }
+      num_nbrs_ += 1.0;
     }
-    mailbox_[0] /= num_nbrs;
-    mailbox_[1] /= num_nbrs;
+    mailbox_[0] /= num_nbrs_;
+    mailbox_[1] /= num_nbrs_;
     dlmc_computation();
   }
   
@@ -127,7 +99,6 @@ public:
     return mailbox_;
   }
   
-
 private:
 
   std::vector<double> getDistribution
@@ -159,10 +130,10 @@ private:
    */
   void dlmc_computation()
   {
-    local_mean = local_partition_[0][T_-1];
-    std::vector<double> n_error = getDistribution(0, (epsilon_/t_), 1);
-    theta_[T_] = v_j + ((epsilon_/t_) / 2) * 
-                    (grad_log_like(v_j, theta_[T_-1], sigma_) + (num_nbrs) * g_j) + n_error[0];
+    double local_mean = local_partition_[row][T_-1];
+    std::vector<double> n_error = getDistribution(0, (epsilon_/T_), 1);
+    theta_[T_] = mailbox_[0] + ((epsilon_/t_) / 2) * 
+                    (grad_log_like(mailbox_[0], theta_[T_-1], sigma_) + (num_nbrs_) * mailbox_[1]) + n_error[0];
     gradient_[T_] = grad_log_like(local_mean, theta_[T_-1], sigma_);
     mailbox_[0] = theta_[T_];
     mailbox_[1] = gradient_[T_];
@@ -172,6 +143,7 @@ private:
   std::vector<double> gradient_;
   std::vector<double> theta_;
   std::vector<std::vector<element_t>> local_partition_;
+  double num_nbrs_;
   size_t sigma_;
   size_t T_;
   size_t epsilon_;

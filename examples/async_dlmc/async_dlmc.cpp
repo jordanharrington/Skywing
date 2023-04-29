@@ -159,6 +159,17 @@ int main(int argc, char* argv[])
       return -1;
     }
   }();
+  std::string matrix_name = [&]() {
+    try
+    {
+      return argv[4];
+    }
+    catch (...)
+    {
+      char *hold ;
+      return hold;
+    }
+  }();
   
   if (machine_number < 0 || machine_number >= size_of_network)
   {
@@ -189,17 +200,6 @@ int main(int argc, char* argv[])
 
   std::string matrix_partition_name = "machine_" + std::to_string(machine_number) + "_row_count_" + std::to_string(number_of_overlapping_components)  + "_" + matrix_name ;
   std::vector<std::vector<double>> A_partition = input_matrix_from_matrix_market<double>(directory, matrix_partition_name);
-
-  std::string rhs_partition_name = "machine_" + std::to_string(machine_number) + "_row_count_" + std::to_string(number_of_overlapping_components)  + "_rhs_" + matrix_name ;
-  std::vector<double> b_partition = input_vector_from_matrix_market<double>(directory, rhs_partition_name);
-
-  // Both of these vectors are contrived since we know the solution. 
-  // These are not used in the jacobi class, only for data output and terminal diagnostics in the example.
-  std::string x_partition_solution_name = "machine_" + std::to_string(machine_number) + "_row_count_" + std::to_string(number_of_overlapping_components)  + "_x_sol_" + matrix_name ;
-  std::vector<double> x_partition_solution = input_vector_from_matrix_market<double>(directory, x_partition_solution_name);
-
-  std::string x_sol_name =  "x_sol_" + matrix_name ;
-  std::vector<double> x_full_solution = input_vector_from_matrix_market<double>("../../../examples/async_jacobi/system", x_sol_name);
 
   // Skywing call
   machine_task(machine_number, number_of_overlapping_components, trial, A_partition, b_partition, x_partition_solution, x_full_solution, row_indices, ports, machine_names, tag_ids, save_directory);
