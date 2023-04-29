@@ -41,19 +41,17 @@ public:
   /**
    */
   DLMCProcessor(
+    std::vector<std::vector<element_t>> local_partition,
     std::size_t epsilon,
-    std::size_t num_nbrs,
-    std::size_t num_iter,
-    std::vector<size_t> local_partition
+    std::size_t num_iter
   )
     : 
     epsilon_(epsilon), T_(1), sigma_(10),
-    theta_(num_iter, 0.0),
-    gradient_(num_iter, 0.0),
+    theta_(num_iter + 1, 0.0),
+    gradient_(num_iter + 1, 1.0),
     local_partition_(local_partition),
-    mailbox_(num_nbrs, 0.0),
-    number_of_updated_components_(num_nbrs),
-    publish_values_(2 * number_of_updated_components_, 0.0)
+    mailbox_(2, 0.0),
+    publish_values_(4, 0.0)
   {
     dlmc_computation();
   }
@@ -64,7 +62,7 @@ public:
    *  twice the number of components updated.
    */
   ValueType get_init_publish_values()
-  { return std::vector<element_t>(2 * number_of_updated_components_, 0.0); }
+  { return std::vector<element_t>{ 0.0, theta_[0], 1.0, gradient_[0]}; }
 
   /** @brief Process an update with a set of new neighbor values.
    *
@@ -76,6 +74,9 @@ public:
   void process_update(const NbrDataHandler& nbr_data_handler,
                       [[maybe_unused]] const IterMethod&)
   {
+    mailbox_[0] = 0.0;
+    mailbox_[1] = 0.0;
+    double num_nbrs = 0.0
     for (const auto& pTag : nbr_data_handler.get_updated_tags())
     {
       ValueType nbr_value = nbr_data_handler.get_data_unsafe(*pTag);
@@ -91,7 +92,7 @@ public:
         // Cycles through individual values in row_index to avoid
         // replacing its own updates if there's overlap in the
         // linear system partition.
-        for(size_t row_index_cycle = 0 ; row_index_cycle < number_of_updated_components_; row_index_cycle++)
+        for(size_t row_index_cycle = 0 ; row_index_cycle < 2; row_index_cycle++)
         {
           if(nbr_value[nbr_vals_ind*2] == row_indices_[row_index_cycle])
             use_this_value = false;
@@ -99,43 +100,33 @@ public:
         if(use_this_value)
         {
           size_t updated_index = static_cast<size_t>(nbr_value[nbr_vals_ind * 2]);
-          mailbox_[updated_index] = nbr_value[nbr_vals_ind * 2 + 1];
-          dlmc_computation();
+          mailbox_[nbr_value[nbr_vals_ind*2]] += nbr_value[nbr_vals_ind * 2 + 1];
+          num_nbrs += 1;
         }
       }
     }
+    mailbox_[0] /= num_nbrs;
+    mailbox_[1] /= num_nbrs;
+    dlmc_computation();
   }
   
   /** @brief Prepare values to send to neighbors.
    */
   ValueType prepare_for_publication(ValueType vals_to_publish)
   {
-    for(size_t i = 0 ; i < number_of_updated_components_; i ++)
+    for(size_t i = 0 ; i < mailbox_.size(); i ++)
     {
-      vals_to_publish[i*2] = row_indices_[i]*1.0;
-      vals_to_publish[i*2+1] = mailbox_[row_indices_[i]];
+      vals_to_publish[i*2] = i*1.0;
+      vals_to_publish[i*2+1] = mailbox_[i];
     }
     return vals_to_publish;
   }
-  
-  /** @brief Return only the components for which this process updates. 
-   */
-  std::vector<element_t> return_partition_solution() const
-  {
-    std::vector<element_t> return_vector;
-    for(size_t i = 0 ; i < number_of_updated_components_; i++)
-    {
-      return_vector.push_back(mailbox_[row_indices_[i]]);
-    }
-    return return_vector;
-  }
 
-  /** @brief Return the full solution.
-   */
   const std::vector<element_t>& return_full_solution() const
   {
     return mailbox_;
   }
+  
 
 private:
 
@@ -168,34 +159,22 @@ private:
    */
   void dlmc_computation()
   {
-    size_t v_j = 0, g_j = 0;
-    for(size_t i = 0 ; i < _num_recieved; i += 2)
-    {
-      v_j += mailbox_[i];
-      g_j += mailbox_[i+1];
-    }
-    v_j = v_j / _num_recieved;
-    g_j = g_j / _num_recieved;
-
-    local_mean = 0
-    for(size_t i = 0 ; i < local_partition_.size(); i++) { local_mean += local_partition_[i];}
-    local_mean /= local_partition_.size();
-
+    local_mean = local_partition_[0][T_-1];
     std::vector<double> n_error = getDistribution(0, (epsilon_/t_), 1);
-    theta_[T_-1] = v_j + ((epsilon_/t_) / 2) * 
-                    (grad_log_like(v_j, theta_[T_-2], sigma_) + (num_nbrs) * g_j) + n_error[0];
-    gradient_[T_-1] = grad_log_like(local_mean, theta_[T_-2], sigma_);
-   
+    theta_[T_] = v_j + ((epsilon_/t_) / 2) * 
+                    (grad_log_like(v_j, theta_[T_-1], sigma_) + (num_nbrs) * g_j) + n_error[0];
+    gradient_[T_] = grad_log_like(local_mean, theta_[T_-1], sigma_);
+    mailbox_[0] = theta_[T_];
+    mailbox_[1] = gradient_[T_];
+    T_ += 1;
   }
 
   std::vector<double> gradient_;
   std::vector<double> theta_;
-  std::vector<size_t> local_partition_;
+  std::vector<std::vector<element_t>> local_partition_;
   size_t sigma_;
   size_t T_;
   size_t epsilon_;
-  
-  
 
   // Variables internal to this class.
   std::vector<element_t> mailbox_;
