@@ -15,9 +15,8 @@ sigma = float(sys.argv[2])
 network_size = int(sys.argv[3])
 system_hold_folder = sys.argv[4]
 np.set_printoptions(suppress=True)
-dir = Path('.')
 distributions = generate_dist_matrix(theta, sigma, network_size)
-mmwrite(system_hold_folder + "dist_matrix.mtx", distributions)
+mmwrite(system_hold_folder + "/dist_matrix.mtx", distributions)
 
 
 
