@@ -57,7 +57,7 @@ std::vector<std::string> obtain_tag_ids(std::uint16_t size_of_network)
 void machine_task(
     int machine_number,
     std::size_t epsilon,
-    std::size_t num_iter,
+    std::size_t iteration_num,
     std::vector<std::vector<double>> local_partition,
     std::vector<std::uint16_t> ports,
     std::vector<std::string> machine_names,
@@ -85,7 +85,7 @@ void machine_task(
                                            StopAfterTime, TrivialResiliencePolicy>;
   Waiter<IterMethod> iter_waiter =
     WaiterBuilder<IterMethod>(manager_handle, job, tag_ids[machine_number], tag_ids)
-    .set_processor(local_partition, epsilon, num_iter)
+    .set_processor(machine_number, static_cast<int>((tag_ids.size())), local_partition, iteration_num)
     .set_publish_policy(1e-6)
     .set_stop_policy(std::chrono::seconds(5))
     .set_resilience_policy()

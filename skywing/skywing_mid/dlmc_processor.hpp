@@ -25,17 +25,16 @@ public:
   /**
    */
   DLMCProcessor(
+    int machine_number,
+    int size_of_network,
     std::vector<std::vector<element_t>> local_partition,
-    std::size_t epsilon,
-    std::size_t num_iter
+    std::size_t iteration_num,
   )
     : 
-    epsilon_(epsilon), T_(1), sigma_(10),
-    theta_(num_iter + 1, 0.0),
-    gradient_(num_iter + 1, 1.0),
+    T_(iteration_num), row_(machine_number), num_nbrs_(size_of_network - 1),
+    sigma_(10), theta_(101, 0.0), gradient_(101, 1.0), epsilon_(100), 
     local_partition_(local_partition),
-    mailbox_(2, 0.0),
-    publish_values_(4, 0.0)
+    mailbox_(2, 0.0), publish_values_(4, 0.0)
   {
     dlmc_computation();
   }
@@ -60,7 +59,6 @@ public:
   {
     mailbox_[0] = 0.0;
     mailbox_[1] = 0.0;
-    num_nbrs_ = 0.0
     for (const auto& pTag : nbr_data_handler.get_updated_tags())
     {
       ValueType nbr_value = nbr_data_handler.get_data_unsafe(*pTag);
@@ -75,7 +73,6 @@ public:
         size_t updated_index = static_cast<size_t>(nbr_value[nbr_vals_ind * 2]);
         mailbox_[nbr_value[nbr_vals_ind*2]] += nbr_value[nbr_vals_ind * 2 + 1];
       }
-      num_nbrs_ += 1.0;
     }
     mailbox_[0] /= num_nbrs_;
     mailbox_[1] /= num_nbrs_;
@@ -130,14 +127,13 @@ private:
    */
   void dlmc_computation()
   {
-    double local_mean = local_partition_[row][T_-1];
+    double local_mean = local_partition_[row_][T_-1];
     std::vector<double> n_error = getDistribution(0, (epsilon_/T_), 1);
-    theta_[T_] = mailbox_[0] + ((epsilon_/t_) / 2) * 
+    theta_[T_] = mailbox_[0] + ((epsilon_/T_) / 2) * 
                     (grad_log_like(mailbox_[0], theta_[T_-1], sigma_) + (num_nbrs_) * mailbox_[1]) + n_error[0];
     gradient_[T_] = grad_log_like(local_mean, theta_[T_-1], sigma_);
     mailbox_[0] = theta_[T_];
     mailbox_[1] = gradient_[T_];
-    T_ += 1;
   }
 
   std::vector<double> gradient_;
@@ -147,6 +143,7 @@ private:
   size_t sigma_;
   size_t T_;
   size_t epsilon_;
+  int row_;
 
   // Variables internal to this class.
   std::vector<element_t> mailbox_;
