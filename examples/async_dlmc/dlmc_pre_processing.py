@@ -10,11 +10,12 @@ import sys
 def generate_dist_matrix(theta, sigma, network_size):
     return np.array([np.random.normal(loc = theta, scale = sigma, size = 100) for x in range(network_size)])
 
+dir = Path('.')
+
 theta = float(sys.argv[1])
 sigma = float(sys.argv[2])
 network_size = int(sys.argv[3])
 system_hold_folder = sys.argv[4]
-np.set_printoptions(suppress=True)
 distributions = generate_dist_matrix(theta, sigma, network_size)
 mmwrite(system_hold_folder + "/dist_matrix.mtx", distributions)
 
