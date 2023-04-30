@@ -32,7 +32,7 @@ system_directory="../../../examples/async_dlmc/system"
 
 python3 ../../../examples/async_dlmc/dlmc_pre_processing.py "$0" "$10" ${size_of_network} ${system_directory} 
 
-echo -e Asyn DLMC: '\t'  matrix: ${matrix_name} '\t' number of distribution divisions: ${size_of_network}
+echo -e Asyn DLMC: '\t'  matrix: ${matrix_name} '\t' number of distribution divisions: ${size_of_network} '\t'  real theta: 10
 
 for (( counter_for_iterations = 1 ; counter_for_iterations <= number_of_iterations ; counter_for_iterations++ ))
 do

@@ -91,6 +91,13 @@ public:
     return vals_to_publish;
   }
 
+  /** @brief Return only the components for which this process updates. 
+   */
+  std::vector<element_t> return_partition_solution() const
+  {
+    return mailbox_;
+  }
+
   const std::vector<element_t>& return_full_solution() const
   {
     return mailbox_;
