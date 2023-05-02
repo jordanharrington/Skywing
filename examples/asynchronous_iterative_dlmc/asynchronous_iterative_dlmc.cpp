@@ -149,7 +149,7 @@ void asynchronous_iterative(
       const auto sleep_ms = std::uniform_int_distribution<int>{1, 5}(prng);
       std::this_thread::sleep_for(std::chrono::milliseconds(sleep_ms));
     }
-    std::cout << config.name << ": Final value is " << own_value[0] << '\n';
+    std::cout << config.name << ": Final value is mu=" << own_value[0] << "and grad=" << own_value[2] << '\n';
   });
   manager.run();
 }
@@ -191,7 +191,7 @@ int main(const int argc, const char* const argv[])
   while(numberOfValues-- > 0){distribution.push_back(nd(gen));}
 
   auto value = std::vector<double>{0.0, 1.0};
-  std::cout << machine_name << ": Own value is " << value[0] << value[1] << '\n';
+  std::cout << machine_name << ": Own value is mu=" << value[0] << "and gradient="<< value[1] << '\n';
 
   asynchronous_iterative(
     config_iter->second,
