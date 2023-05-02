@@ -84,7 +84,7 @@ void machine_task(
                                            StopAfterTime, TrivialResiliencePolicy>;
   Waiter<IterMethod> iter_waiter =
     WaiterBuilder<IterMethod>(manager_handle, job, tag_ids[machine_number], tag_ids)
-    .set_processor(machine_number, size_of_network, iteration_num)
+    .set_processor(ize_of_network, iteration_num)
     .set_publish_policy(1e-6)
     .set_stop_policy(std::chrono::seconds(5))
     .set_resilience_policy()
@@ -174,15 +174,14 @@ int main(int argc, char* argv[])
     return -1;
   }
 
-  int epsilon = std::stoi(argv[4]);
-  int iteration_num = std::stoi(argv[5]);
+  int iteration_num = std::stoi(argv[4]);
   //This creates the relevant vectors needed to interact with skywing.
   auto ports = set_port(starting_port_number, size_of_network);
   auto machine_names = obtain_machine_names(size_of_network);
   std::vector<std::string> tag_ids = obtain_tag_ids(size_of_network);
 
   // Skywing call
- machine_task(machine_number, size_of_network, epsilon,iteration_num,ports, machine_names, tag_ids);
+ machine_task(machine_number, size_of_network, iteration_num, ports, machine_names, tag_ids);
 
   return 0;
 }
