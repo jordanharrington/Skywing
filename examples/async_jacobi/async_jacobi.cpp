@@ -72,6 +72,10 @@ void machine_task(
     std::string save_directory)
 {
 
+  std::cout << machine_number << std::endl;
+  print_vec<std::uint16_t>(ports);
+  print_vec<std::string>(machine_names);
+
   skywing::Manager manager{ports[machine_number], machine_names[machine_number]};
 
   manager.submit_job("job", [&](skywing::Job& job, ManagerHandle manager_handle) {
