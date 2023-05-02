@@ -65,6 +65,8 @@ void machine_task(
 
   skywing::Manager manager{ports[machine_number], machine_names[machine_number]};
 
+  std::cout << "Got HERE" << std::endl;
+
   manager.submit_job("job", [&](skywing::Job& job, ManagerHandle manager_handle) {
 
 
