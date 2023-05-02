@@ -197,7 +197,7 @@ int main(const int argc, const char* const argv[])
     value,
     [iter = 1](const double& self_value, 
               const std::vector<double>& other_values, 
-              const std::vector<double>& distribution,
+              const std::vector<double>& distribution
               ) mutable {
       double v_j = 0.0, num_nbrs = 0.0;
       for(double theta : other_values) {v_j+=theta; ++num_nbrs;}
