@@ -31,7 +31,7 @@ public:
     : 
     T_(iteration_num), 
     num_nbrs_(size_of_network - 1),
-    local_partition_(std::normal_distribution<double> d{10,0};),
+    local_partition_(std::normal_distribution<double> d{10,0}),
     sigma_(10), 
     theta_(101, 0.0), 
     gradient_(101, 1.0), 
