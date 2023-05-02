@@ -13,7 +13,7 @@ STARTING_PORT=$1
 # size_of_network=4
 # matrix_name="toy.mtx"
 size_of_network=4
-number_of_iterations=100
+number_of_iterations=10
 
 trap kill_progs EXIT
 kill_progs() {

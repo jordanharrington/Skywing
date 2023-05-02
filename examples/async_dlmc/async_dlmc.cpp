@@ -63,8 +63,6 @@ void machine_task(
     std::vector<std::string> tag_ids)
 {
 
-  std::cout << machine_number << std::endl;
-
   skywing::Manager manager{ports[machine_number], machine_names[machine_number]};
 
   manager.submit_job("job", [&](skywing::Job& job, ManagerHandle manager_handle) {
@@ -104,18 +102,6 @@ void machine_task(
     });
   std::cout << "Machine " << machine_number << " finished dlmc iteration." << std::endl;
 
-  double run_time = async_dlmc.run_time().count();
-  int information_received = async_dlmc.get_iteration_count();
-  std::cout << std::endl;
-  std::cout << "\t New Info: \t" << information_received ; 
-  std::cout << std::endl;
-  std::cout << "\t Runtime: \t" << run_time; 
-  std::cout << std::endl;      
-  std::cout << "\t Iteration Complete: \t" << !async_dlmc.return_iterate() ; 
-  std::cout << std::endl;
-  std::cout << "--------------------------------------------" << std::endl;
-  std::this_thread::sleep_for(std::chrono::seconds(10));
-  });
   manager.run();
 }
 
