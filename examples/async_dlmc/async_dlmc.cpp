@@ -84,7 +84,7 @@ void machine_task(
                                            StopAfterTime, TrivialResiliencePolicy>;
   Waiter<IterMethod> iter_waiter =
     WaiterBuilder<IterMethod>(manager_handle, job, tag_ids[machine_number], tag_ids)
-    .set_processor(ize_of_network, iteration_num)
+    .set_processor(size_of_network, iteration_num)
     .set_publish_policy(1e-6)
     .set_stop_policy(std::chrono::seconds(5))
     .set_resilience_policy()
