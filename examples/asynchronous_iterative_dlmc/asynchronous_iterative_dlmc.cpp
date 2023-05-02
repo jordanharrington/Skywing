@@ -112,7 +112,7 @@ void asynchronous_iterative(
             return value.second;
           });
         bool should_exit = false;
-        std::tie(own_value, should_exit) = act_on(own_value, other_values);
+        std::tie(own_value, should_exit) = act_on(own_value, other_values, distribution);
         job.publish(config.tags_produced.front(), own_value);
         if (should_exit) { break; }
       }
@@ -169,11 +169,10 @@ int main(const int argc, const char* const argv[])
     configurations,
     distribution,
     value,
-    [iter = 0](const double& self_value, const std::vector<double>& other_values) mutable {
-      constexpr int num_iters = 5'000;
-      const auto new_value
-        = std::accumulate(other_values.cbegin(), other_values.cend(), self_value) / (other_values.size() + 1);
+    [iter = 0](const double& self_value, 
+              const std::vector<double>& other_values, 
+              const std::vector<double>& distribution) mutable {
       ++iter;
-      return std::make_pair(new_value, iter > num_iters);
+      return std::make_pair(0, false);
     });
 }
