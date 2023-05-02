@@ -74,7 +74,7 @@ public:
       for(size_t nbr_vals_ind = 0; nbr_vals_ind < (nbr_value.size()/2); nbr_vals_ind++)
       {
         size_t updated_index = static_cast<size_t>(nbr_value[nbr_vals_ind * 2]);
-        mailbox_[nbr_value[nbr_vals_ind*2]] += nbr_value[nbr_vals_ind * 2 + 1];
+        mailbox_[updated_index] += nbr_value[nbr_vals_ind * 2 + 1];
       }
     }
     mailbox_[0] /= num_nbrs_;
