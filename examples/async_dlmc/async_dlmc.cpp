@@ -89,6 +89,7 @@ void machine_task(
     .set_stop_policy(std::chrono::seconds(5))
     .set_resilience_policy()
     .build_waiter();
+    
   std::cout << "Machine " << machine_number << " about to get iteration object." << std::endl;
   IterMethod async_dlmc = iter_waiter.get();
                                        
@@ -119,7 +120,7 @@ void machine_task(
 int main(int argc, char* argv[])
 {
   // Error checking for the number of arguments
-  if (argc != 9)
+  if (argc != 5)
   {
     std::cout << "Usage: Wrong Number of Arguments: " << argc << std::endl;
     return 1;
