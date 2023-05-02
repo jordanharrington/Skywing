@@ -57,7 +57,6 @@ std::vector<std::string> obtain_tag_ids(std::uint16_t size_of_network)
 void machine_task(
     int machine_number,
     int size_of_network,
-    std::size_t epsilon,
     std::size_t iteration_num,
     std::vector<std::uint16_t> ports,
     std::vector<std::string> machine_names,
