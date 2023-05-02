@@ -110,7 +110,7 @@ void asynchronous_iterative(
       std::exit(1);
     }
     // Cache previous values seen to feed to the callable function
-    std::unordered_map<std::string,std::vector<double> neighbor_values;
+    std::unordered_map<std::string,std::vector<double>> neighbor_values;
     std::vector<double> own_value = initial_value;
     job.publish(config.tags_produced.front(), own_value);
     std::ranlux48 prng{std::random_device{}()};
