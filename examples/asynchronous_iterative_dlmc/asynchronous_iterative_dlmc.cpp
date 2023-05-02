@@ -190,9 +190,9 @@ int main(const int argc, const char* const argv[])
   while(numberOfValues-- > 0){distribution.push_back(nd(gen));}
 
   std::tuple<double,double> value;
-  value = make_tuple(0.0, 1.0);
+  value = std::make_tuple(0.0, 1.0);
 
-  std::cout << machine_name << ": Own value is " << value << '\n';
+  std::cout << machine_name << ": Own value is " << get<0>(value) << get<1>(value) << '\n';
   asynchronous_iterative(
     config_iter->second,
     configurations,
@@ -207,7 +207,7 @@ int main(const int argc, const char* const argv[])
       for(std::tuple<double,double> nbr_val : other_values) {v_j+=get<0>(nbr_val); g_j+=get<1>(nbr_val); ++num_nbrs;}
       std::vector<double> n_error = getDistribution(0, (100/iter), 1);
       v_j = (v_j / num_nbrs);
-      const auto new_value = v_j + (((100/iter)/2) * (grad_log_like(v_j, self_value, 10) + num_nbrs)) + n_error[0];
+      const auto new_value = v_j + (((100/iter)/2) * (grad_log_like(v_j, get<0>(self_value), 10) + num_nbrs)) + n_error[0];
       ++iter;
       return std::make_pair(std::tuple<double, double>(0.0,0.0), iter > num_iters);
     });
