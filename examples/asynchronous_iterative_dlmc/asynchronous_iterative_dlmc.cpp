@@ -119,7 +119,8 @@ void asynchronous_iterative(
       const auto sleep_ms = std::uniform_int_distribution<int>{1, 5}(prng);
       std::this_thread::sleep_for(std::chrono::milliseconds(sleep_ms));
     }
-    std::cout << config.name << ": Final value is " << own_value << '\n';
+    std::cout << config.name << ": Final value is " << '\n';
+    for (double i: own_value) {std::cout << i << ' ';}
   });
   manager.run();
 }
@@ -172,9 +173,9 @@ int main(const int argc, const char* const argv[])
     config_iter->second,
     configurations,
     values,
-    [iter = 0](const double& self_value, const std::vector<double>& other_values) mutable {
+    [iter = 0](const std::vector<double>double& self_value, const std::vector<double>& other_values) mutable {
       constexpr int num_iters = 5'000;
-      const auto new_value
+      const std::vector<double> new_value
         = std::accumulate(other_values.cbegin(), other_values.cend(), self_value) / (other_values.size() + 1);
       ++iter;
       return std::make_pair(new_value, iter > num_iters);
