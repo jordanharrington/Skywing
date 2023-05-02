@@ -108,7 +108,7 @@ void machine_task(
   std::cout << std::endl;
   std::cout << "\t Runtime: \t" << run_time; 
   std::cout << std::endl;      
-  std::cout << "\t Iteration Complete: \t" << !async_jacobi.return_iterate() ; 
+  std::cout << "\t Iteration Complete: \t" << !async_dlmc.return_iterate() ; 
   std::cout << std::endl;
   std::cout << "--------------------------------------------" << std::endl;
   std::this_thread::sleep_for(std::chrono::seconds(10));
@@ -194,15 +194,11 @@ int main(int argc, char* argv[])
   auto machine_names = obtain_machine_names(size_of_network);
   std::vector<std::string> tag_ids = obtain_tag_ids(size_of_network);
 
-  // This collects the matrices and vectors for the function.
-  std::string row_index_name= "machine_" + std::to_string(machine_number) + "_row_count_" + std::to_string(number_of_overlapping_components)  + "_indices_" + matrix_name ;
-  std::vector<size_t> row_indices = input_vector_from_matrix_market<size_t>(directory, row_index_name);
-
   std::string matrix_partition_name = "machine_" + std::to_string(machine_number) + "_row_count_" + std::to_string(number_of_overlapping_components)  + "_" + matrix_name ;
   std::vector<std::vector<double>> A_partition = input_matrix_from_matrix_market<double>(directory, matrix_partition_name);
 
   // Skywing call
-  machine_task(machine_number, number_of_overlapping_components, trial, A_partition, b_partition, x_partition_solution, x_full_solution, row_indices, ports, machine_names, tag_ids, save_directory);
+  machine_task(machine_number, number_of_overlapping_components, trial, A_partition,  ports, machine_names, tag_ids, save_directory);
 
   return 0;
 }

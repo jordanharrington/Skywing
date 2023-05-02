@@ -3,6 +3,7 @@
 
 #include "skywing_core/job.hpp"
 #include "skywing_core/manager.hpp"
+
 #include <random>
 #include <vector>
 #include <cmath>
@@ -28,13 +29,17 @@ public:
     int machine_number,
     int size_of_network,
     std::vector<std::vector<element_t>> local_partition,
-    std::size_t iteration_num,
-  )
-    : 
-    T_(iteration_num), row_(machine_number), num_nbrs_(size_of_network - 1),
-    sigma_(10), theta_(101, 0.0), gradient_(101, 1.0), epsilon_(100), 
+    std::size_t iteration_num)
+    : T_(iteration_num), 
+    row_(machine_number), 
+    num_nbrs_(size_of_network - 1),
+    sigma_(10), 
+    theta_(101, 0.0), 
+    gradient_(101, 1.0), 
+    epsilon_(100), 
     local_partition_(local_partition),
-    mailbox_(2, 0.0), publish_values_(4, 0.0)
+    mailbox_(2, 0.0), 
+    publish_values_(4, 0.0)
   {
     dlmc_computation();
   }
@@ -126,7 +131,7 @@ private:
     double x, double mu, double sigma
   ) 
   {
-     return (1 / pow(sigma, 2)) * (x - mu)
+     return (1 / pow(sigma, 2)) * (x - mu);
   }
 
 
