@@ -9,6 +9,7 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
+#include <math>
 
 #include "skywing_core/enable_logging.hpp"
 
@@ -44,6 +45,30 @@ struct MachineConfig {
     return in;
   }
 };
+
+std::vector<double> getDistribution
+  (
+      double x_mu, double x_sigma, size_t numberOfValues
+  )
+  {
+      std::mt19937 gen((std::random_device())());
+      std::normal_distribution<double> nd(x_mu, x_sigma);
+      std::vector<double> result;
+      result.reserve(numberOfValues);
+      while(numberOfValues-- > 0)
+      {
+          result.push_back(nd(gen));
+      }
+      return result;
+  }
+
+double grad_log_like
+  (
+    double x, double mu, double sigma
+  ) 
+  {
+     return (1 / pow(sigma, 2)) * (x - mu);
+  }
 
 // Callable signature: auto func(const double&, std::vector<double>&) -> std::pair<double, bool>
 // The bool is to indicate if the function should continue iterating
@@ -125,6 +150,7 @@ void asynchronous_iterative(
   manager.run();
 }
 
+
 int main(const int argc, const char* const argv[])
 {
   // Explicitly disable logging as the output is too noisy otherwise
@@ -169,10 +195,16 @@ int main(const int argc, const char* const argv[])
     configurations,
     distribution,
     value,
-    [iter = 0](const double& self_value, 
+    [iter = 1](const double& self_value, 
               const std::vector<double>& other_values, 
-              const std::vector<double>& distribution) mutable {
+              const std::vector<double>& distribution,
+              ) mutable {
+      double v_j = 0.0, num_nbrs = 0.0;
+      for(double theta : other_values) {v_j+=theta; ++num_nbrs;}
+      std::vector<double> n_error = getDistribution(0, (100/iter), 1);
+      v_j = (v_j / num_nbrs);
+      const auto new_value = v_j + ((100/iter)/2) * (grad_log_like(v_j, self_value, 10) + num_nbrs) + n_error[0];
       ++iter;
-      return std::make_pair(0, false);
+      return std::make_pair(new_value, false);
     });
 }
