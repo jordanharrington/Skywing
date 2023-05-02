@@ -133,10 +133,13 @@ void asynchronous_iterative(
       }
       else {
         std::vector<std::vector<double>> other_values;
-        std::transform(
-          neighbor_values.cbegin(), neighbor_values.cend(), std::back_inserter(other_values), [](const auto value) {
-            return value;
-          });
+        for (auto value : neighbor_values){
+          other_values.push_back(value)
+        }
+        // std::transform(
+        //   neighbor_values.cbegin(), neighbor_values.cend(), std::back_inserter(other_values), [](const auto value) {
+        //     return value;
+        //   });
         bool should_exit = false;
         std::tie(own_value, should_exit) = act_on(own_value, other_values, distribution);
         job.publish(config.tags_produced.front(), own_value);
