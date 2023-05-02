@@ -56,10 +56,7 @@ std::vector<double> getDistribution
       std::normal_distribution<double> nd(x_mu, x_sigma);
       std::vector<double> result;
       result.reserve(numberOfValues);
-      while(numberOfValues-- > 0)
-      {
-          result.push_back(nd(gen));
-      }
+      while(numberOfValues-- > 0) { result.push_back(nd(gen));}
       return result;
   }
 
@@ -149,7 +146,7 @@ void asynchronous_iterative(
       const auto sleep_ms = std::uniform_int_distribution<int>{1, 5}(prng);
       std::this_thread::sleep_for(std::chrono::milliseconds(sleep_ms));
     }
-    std::cout << config.name << ": Final value is mu=" << own_value[0] << "and grad=" << own_value[2] << '\n';
+    std::cout << config.name << ": Final value is mu=" << own_value[0] << " and gradient=" << own_value[2] << '\n';
   });
   manager.run();
 }
@@ -183,15 +180,9 @@ int main(const int argc, const char* const argv[])
     return 1;
   }
 
-  int numberOfValues = 100;
-  std::mt19937 gen((std::random_device())());
-  std::normal_distribution<double> nd(0, 10);
-  std::vector<double> distribution;
-  distribution.reserve(numberOfValues);
-  while(numberOfValues-- > 0){distribution.push_back(nd(gen));}
-
+  std::vector<double> distribution = getDistribution(0, 10, 100); 
   auto value = std::vector<double>{0.0, 1.0};
-  std::cout << machine_name << ": Own value is mu=" << value[0] << "and gradient="<< value[1] << '\n';
+  std::cout << machine_name << ": Own value is mu=" << value[0] << " and gradient="<< value[1] << '\n';
 
   asynchronous_iterative(
     config_iter->second,
@@ -202,7 +193,7 @@ int main(const int argc, const char* const argv[])
               const std::vector<std::vector<double>>& other_values, 
               const std::vector<double>& distribution
               ) mutable {
-      constexpr int num_iters = 5'000;
+      constexpr int num_iters = 100;
       double v_j = 0.0, g_j = 0.0, num_nbrs = 0.0, sigma = 10.0;
       for(std::vector<double> nbr_val : other_values) {v_j+=nbr_val[0]; g_j+=nbr_val[1]; ++num_nbrs;}
       std::vector<double> n_error = getDistribution(0, (100/iter), 1);
