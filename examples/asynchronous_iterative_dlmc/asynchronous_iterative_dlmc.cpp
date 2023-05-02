@@ -78,7 +78,7 @@ void asynchronous_iterative(
   const MachineConfig& config,
   const std::unordered_map<std::string, MachineConfig>& machines,
   const std::vector<double> distribution,
-  const tuple<double,double> initial_value,
+  const std::tuple<double,double> initial_value,
   Callable act_on)
 {
   skywing::Manager manager(config.port, config.name);
@@ -110,8 +110,8 @@ void asynchronous_iterative(
       std::exit(1);
     }
     // Cache previous values seen to feed to the callable function
-    std::unordered_map<std::string, tuple<double,double>> neighbor_values;
-    tuple<double,double> own_value = initial_value;
+    std::unordered_map<std::string, std::tuple<double,double>> neighbor_values;
+    std::tuple<double,double> own_value = initial_value;
     job.publish(config.tags_produced.front(), own_value);
     std::ranlux48 prng{std::random_device{}()};
     while (true) {
@@ -132,9 +132,9 @@ void asynchronous_iterative(
         if (should_exit) { break; }
       }
       else {
-        std::vector<tuple<double,double>> other_values;
+        std::vector<std::tuple<double,double>> other_values;
         std::transform(
-          neighbor_values.cbegin(), neighbor_values.cend(), std::back_inserter(other_values), [](const tuple<double,double>& value) {
+          neighbor_values.cbegin(), neighbor_values.cend(), std::back_inserter(other_values), [](const std::tuple<double,double>& value) {
             return value.second;
           });
         bool should_exit = false;
@@ -189,7 +189,7 @@ int main(const int argc, const char* const argv[])
   distribution.reserve(numberOfValues);
   while(numberOfValues-- > 0){distribution.push_back(nd(gen));}
 
-  tuple<double,double> value;
+  std::tuple<double,double> value;
   value = make_tuple(0.0, 1.0);
 
   std::cout << machine_name << ": Own value is " << value << '\n';
@@ -198,17 +198,17 @@ int main(const int argc, const char* const argv[])
     configurations,
     distribution,
     value,
-    [iter = 1](const double& self_value, 
+    [iter = 1](const std::tuple<double, double>& self_value, 
               const std::vector<double>& other_values, 
               const std::vector<double>& distribution
               ) mutable {
       constexpr int num_iters = 5'000;
       double v_j = 0.0, g_j = 0.0, num_nbrs = 0.0;
-      for(tuple<double,double>nbr_val : other_values) {v_j+=get<0>(nbr_val); g_j+=get<1>(nbr_val); ++num_nbrs;}
+      for(std::tuple<double,double> nbr_val : other_values) {v_j+=get<0>(nbr_val); g_j+=get<1>(nbr_val); ++num_nbrs;}
       std::vector<double> n_error = getDistribution(0, (100/iter), 1);
       v_j = (v_j / num_nbrs);
       const auto new_value = v_j + (((100/iter)/2) * (grad_log_like(v_j, self_value, 10) + num_nbrs)) + n_error[0];
       ++iter;
-      return std::make_pair(tuple<double, double>(0.0,0.0), iter > num_iters);
+      return std::make_pair(std::tuple<double, double>(0.0,0.0), iter > num_iters);
     });
 }
