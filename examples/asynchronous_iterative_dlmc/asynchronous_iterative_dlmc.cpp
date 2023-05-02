@@ -135,7 +135,7 @@ void asynchronous_iterative(
         std::vector<std::tuple<double,double>> other_values;
         std::transform(
           neighbor_values.cbegin(), neighbor_values.cend(), std::back_inserter(other_values), [](const std::tuple<double,double>& value) {
-            return value.second;
+            return value;
           });
         bool should_exit = false;
         std::tie(own_value, should_exit) = act_on(own_value, other_values, distribution);
@@ -146,7 +146,7 @@ void asynchronous_iterative(
       const auto sleep_ms = std::uniform_int_distribution<int>{1, 5}(prng);
       std::this_thread::sleep_for(std::chrono::milliseconds(sleep_ms));
     }
-    std::cout << config.name << ": Final value is " << own_value << '\n';
+    std::cout << config.name << ": Final value is " << get<0>(own_value) << '\n';
   });
   manager.run();
 }
@@ -199,7 +199,7 @@ int main(const int argc, const char* const argv[])
     distribution,
     value,
     [iter = 1](const std::tuple<double, double>& self_value, 
-              const std::vector<double>& other_values, 
+              const std::vector<std::tuple<double, double>>& other_values, 
               const std::vector<double>& distribution
               ) mutable {
       constexpr int num_iters = 5'000;
