@@ -32,14 +32,14 @@ kill_progs() {
 echo -e Asyn DLMC: number of distribution divisions: ${size_of_network} '\t'  real theta: 10
 
 for (( counter_for_iterations = 1 ; counter_for_iterations <= number_of_iterations ; counter_for_iterations++ ))
-  echo -e welp
 do
-  for (( counter_for_network_elements=0 ;  counter_for_network_elements < size_of_network ; counter_for_network_elements++ ))
-  do
+    echo -e welp
+    for (( counter_for_network_elements=0 ;  counter_for_network_elements < size_of_network ; counter_for_network_elements++ ))
+    do
     "@async_dlmc_exe@" ${counter_for_network_elements} ${STARTING_PORT} ${size_of_network} ${counter_for_iterations} &
     declare "erase${counter_for_network_elements}=$!"
-  done
-  sleep 10
-  kill_progs
-  STARTING_PORT=$((STARTING_PORT+size_of_network+100))
+    done
+    sleep 10
+    kill_progs
+    STARTING_PORT=$((STARTING_PORT+size_of_network+100))
 done
