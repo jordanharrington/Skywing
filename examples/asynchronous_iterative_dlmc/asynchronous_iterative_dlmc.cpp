@@ -199,12 +199,13 @@ int main(const int argc, const char* const argv[])
               const std::vector<double>& other_values, 
               const std::vector<double>& distribution
               ) mutable {
+      constexpr int num_iters = 5'000;
       double v_j = 0.0, num_nbrs = 0.0;
       for(double theta : other_values) {v_j+=theta; ++num_nbrs;}
       std::vector<double> n_error = getDistribution(0, (100/iter), 1);
       v_j = (v_j / num_nbrs);
       const auto new_value = v_j + ((100/iter)/2) * (grad_log_like(v_j, self_value, 10) + num_nbrs) + n_error[0];
       ++iter;
-      return std::make_pair(new_value, false);
+      return std::make_pair(new_value, iter > num_iters);
     });
 }
