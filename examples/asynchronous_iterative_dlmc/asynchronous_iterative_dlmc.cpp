@@ -78,7 +78,7 @@ void asynchronous_iterative(
   const MachineConfig& config,
   const std::unordered_map<std::string, MachineConfig>& machines,
   const std::vector<double> distribution,
-  const std::tuple<double,double> initial_value,
+  const std::vector<double> initial_value,
   Callable act_on)
 {
   skywing::Manager manager(config.port, config.name);
@@ -110,14 +110,14 @@ void asynchronous_iterative(
       std::exit(1);
     }
     // Cache previous values seen to feed to the callable function
-    std::unordered_map<std::string, std::tuple<double,double>> neighbor_values;
-    std::tuple<double,double> own_value = initial_value;
-    job.publish(config.tags_produced.front(), std::make_tuple(std::get<0>(own_value), std::get<1>(own_value)));
+    std::unordered_map<std::string,std::vector<double> neighbor_values;
+    std::vector<double> own_value = initial_value;
+    job.publish(config.tags_produced.front(), own_value);
     std::ranlux48 prng{std::random_device{}()};
     while (true) {
       // Gather data from subscriptions
       for (const auto& sub_tag : config.tags_to_subscribe_to) {
-        if (job.has_data(sub_tag)) { neighbor_values[sub_tag.id()] = std::make_tuple(*job.get_waiter(sub_tag).get()); }
+        if (job.has_data(sub_tag)) { neighbor_values[sub_tag.id()] = *job.get_waiter(sub_tag).get(); }
       }
       // Only call the function if there's any data that's been seen
       if (neighbor_values.empty()) {
@@ -132,9 +132,9 @@ void asynchronous_iterative(
         if (should_exit) { break; }
       }
       else {
-        std::vector<std::tuple<double,double>> other_values;
+        std::vector<std::vector<double>> other_values;
         std::transform(
-          neighbor_values.cbegin(), neighbor_values.cend(), std::back_inserter(other_values), [](const std::tuple<double,double>& value) {
+          neighbor_values.cbegin(), neighbor_values.cend(), std::back_inserter(other_values), [](const std::vector<double>& value) {
             return value;
           });
         bool should_exit = false;
@@ -146,7 +146,7 @@ void asynchronous_iterative(
       const auto sleep_ms = std::uniform_int_distribution<int>{1, 5}(prng);
       std::this_thread::sleep_for(std::chrono::milliseconds(sleep_ms));
     }
-    std::cout << config.name << ": Final value is " << std::get<0>(own_value) << '\n';
+    std::cout << config.name << ": Final value is " << own_value[0] << '\n';
   });
   manager.run();
 }
@@ -187,25 +187,25 @@ int main(const int argc, const char* const argv[])
   distribution.reserve(numberOfValues);
   while(numberOfValues-- > 0){distribution.push_back(nd(gen));}
 
-  auto value = std::make_tuple(0.0, 1.0);
-  std::cout << machine_name << ": Own value is " << std::get<0>(value) << std::get<1>(value) << '\n';
+  auto value = std::vector<double>{0.0, 1.0};
+  std::cout << machine_name << ": Own value is " << value[0] << value[1] << '\n';
 
   asynchronous_iterative(
     config_iter->second,
     configurations,
     distribution,
     value,
-    [iter = 1](const std::tuple<double, double>& self_value, 
-              const std::vector<std::tuple<double, double>>& other_values, 
+    [iter = 1](const std::vector<double>& self_value, 
+              const std::vector<std::vector<double>>& other_values, 
               const std::vector<double>& distribution
               ) mutable {
       constexpr int num_iters = 5'000;
       double v_j = 0.0, g_j = 0.0, num_nbrs = 0.0;
-      for(std::tuple<double,double> nbr_val : other_values) {v_j+=std::get<0>(nbr_val); g_j+=std::get<1>(nbr_val); ++num_nbrs;}
+      for(std::vector<double> nbr_val : other_values) {v_j+=nbr_val[0]; g_j+=nbr_val[1]; ++num_nbrs;}
       std::vector<double> n_error = getDistribution(0, (100/iter), 1);
       v_j = (v_j / num_nbrs);
-      const auto new_value = v_j + (((100/iter)/2) * (grad_log_like(v_j, std::get<0>(self_value), 10) + num_nbrs)) + n_error[0];
+      const auto new_value = v_j + (((100/iter)/2) * (grad_log_like(v_j, self_value[0], 10) + num_nbrs)) + n_error[0];
       ++iter;
-      return std::make_pair(std::tuple<double, double>(0.0,0.0), iter > num_iters);
+      return std::make_pair(std::vector<double>{0.0,0.0}, iter > num_iters);
     });
 }
