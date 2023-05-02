@@ -7,6 +7,7 @@ if build_lc_examples
 endif
 
 subdir('sync_jacobi')
+subdir('async_dlmc')
 subdir('async_jacobi')
 subdir('mean_or_sum')
 subdir('collective_count')
