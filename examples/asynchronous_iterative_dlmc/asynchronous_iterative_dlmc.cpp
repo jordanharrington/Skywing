@@ -51,6 +51,7 @@ template<typename Callable>
 void asynchronous_iterative(
   const MachineConfig& config,
   const std::unordered_map<std::string, MachineConfig>& machines,
+  const std::vector<double> distribution,
   const double initial_value,
   Callable act_on)
 {
@@ -157,15 +158,16 @@ int main(const int argc, const char* const argv[])
   int numberOfValues = 100;
   std::mt19937 gen((std::random_device())());
   std::normal_distribution<double> nd(0, 10);
-  std::vector<double> initial_dist;
-  initial_dist.reserve(numberOfValues);
-  while(numberOfValues-- > 0){initial_dist.push_back(nd(gen));}
+  std::vector<double> distribution;
+  initial_dist.reserve(distribution);
+  while(numberOfValues-- > 0){distribution.push_back(nd(gen));}
   
   const auto value = 0;
   std::cout << machine_name << ": Own value is " << value << '\n';
   asynchronous_iterative(
     config_iter->second,
     configurations,
+    distribution,
     value,
     [iter = 0](const double& self_value, const std::vector<double>& other_values) mutable {
       constexpr int num_iters = 5'000;
