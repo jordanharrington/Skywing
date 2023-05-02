@@ -112,7 +112,7 @@ void asynchronous_iterative(
     // Cache previous values seen to feed to the callable function
     std::unordered_map<std::string, std::tuple<double,double>> neighbor_values;
     std::tuple<double,double> own_value = initial_value;
-    job.publish_tuple(config.tags_produced.front(), own_value);
+    job.publish(config.tags_produced.front(), own_value);
     std::ranlux48 prng{std::random_device{}()};
     while (true) {
       // Gather data from subscriptions
@@ -179,8 +179,6 @@ int main(const int argc, const char* const argv[])
     std::cerr << "Could not find configuration for machine \"" << machine_name << "\"\n";
     return 1;
   }
-  // This just averages a random number on each machine, not particularly
-  // useful, but I'm not sure what to do here
 
   int numberOfValues = 100;
   std::mt19937 gen((std::random_device())());
@@ -189,10 +187,9 @@ int main(const int argc, const char* const argv[])
   distribution.reserve(numberOfValues);
   while(numberOfValues-- > 0){distribution.push_back(nd(gen));}
 
-  std::tuple<double,double> value;
-  value = std::make_tuple(0.0, 1.0);
-
+  auto value = std::make_tuple(0.0, 1.0);
   std::cout << machine_name << ": Own value is " << std::get<0>(value) << std::get<1>(value) << '\n';
+
   asynchronous_iterative(
     config_iter->second,
     configurations,
