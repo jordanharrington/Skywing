@@ -153,13 +153,26 @@ int main(const int argc, const char* const argv[])
   }
   // This just averages a random number on each machine, not particularly
   // useful, but I'm not sure what to do here
-  auto rng = std::random_device{};
-  const auto value = std::uniform_real_distribution<double>{-100, 100}(rng);
-  std::cout << machine_name << ": Own value is " << value << '\n';
+
+  int numberOfValues = 100;
+  std::mt19937 gen((std::random_device())());
+  std::normal_distribution<double> nd(x_mu, x_sigma);
+  std::vector<double> initial_dist;
+  initial_dist.reserve(numberOfValues);
+  while(numberOfValues-- > 0){initial_dist.push_back(nd(gen));}
+
+  const double init_theta = 0.0;
+  const double init_grad = 1.0;
+
+ std::vector<double> values{init_theta, init_grad};
+
+  std::cout << machine_name << ": Own value is " << '\n';
+  print_vec<std::double>(values);
+
   asynchronous_iterative(
     config_iter->second,
     configurations,
-    value,
+    values,
     [iter = 0](const double& self_value, const std::vector<double>& other_values) mutable {
       constexpr int num_iters = 5'000;
       const auto new_value
