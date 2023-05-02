@@ -146,7 +146,7 @@ void asynchronous_iterative(
       const auto sleep_ms = std::uniform_int_distribution<int>{1, 5}(prng);
       std::this_thread::sleep_for(std::chrono::milliseconds(sleep_ms));
     }
-    std::cout << config.name << ": Final value is " << get<0>(own_value) << '\n';
+    std::cout << config.name << ": Final value is " << std::get<0>(own_value) << '\n';
   });
   manager.run();
 }
@@ -192,7 +192,7 @@ int main(const int argc, const char* const argv[])
   std::tuple<double,double> value;
   value = std::make_tuple(0.0, 1.0);
 
-  std::cout << machine_name << ": Own value is " << get<0>(value) << get<1>(value) << '\n';
+  std::cout << machine_name << ": Own value is " << std::get<0>(value) << std::get<1>(value) << '\n';
   asynchronous_iterative(
     config_iter->second,
     configurations,
@@ -204,10 +204,10 @@ int main(const int argc, const char* const argv[])
               ) mutable {
       constexpr int num_iters = 5'000;
       double v_j = 0.0, g_j = 0.0, num_nbrs = 0.0;
-      for(std::tuple<double,double> nbr_val : other_values) {v_j+=get<0>(nbr_val); g_j+=get<1>(nbr_val); ++num_nbrs;}
+      for(std::tuple<double,double> nbr_val : other_values) {v_j+=std::get<0>(nbr_val); g_j+=std::get<1>(nbr_val); ++num_nbrs;}
       std::vector<double> n_error = getDistribution(0, (100/iter), 1);
       v_j = (v_j / num_nbrs);
-      const auto new_value = v_j + (((100/iter)/2) * (grad_log_like(v_j, get<0>(self_value), 10) + num_nbrs)) + n_error[0];
+      const auto new_value = v_j + (((100/iter)/2) * (grad_log_like(v_j, std::get<0>(self_value), 10) + num_nbrs)) + n_error[0];
       ++iter;
       return std::make_pair(std::tuple<double, double>(0.0,0.0), iter > num_iters);
     });
