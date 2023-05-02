@@ -103,7 +103,7 @@ void machine_task(
   std::cout << "Machine " << machine_number << " finished dlmc iteration." << std::endl;
 
   manager.run();
-  };
+  }
 }
 
 
