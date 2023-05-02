@@ -56,13 +56,12 @@ std::vector<std::string> obtain_tag_ids(std::uint16_t size_of_network)
 // All of the Skywing specific code is located in this function.
 void machine_task(
     int machine_number,
+    int size_of_network,
     std::size_t epsilon,
     std::size_t iteration_num,
-    std::vector<std::vector<double>> local_partition,
     std::vector<std::uint16_t> ports,
     std::vector<std::string> machine_names,
-    std::vector<std::string> tag_ids,
-    std::string save_directory)
+    std::vector<std::string> tag_ids)
 {
 
   skywing::Manager manager{ports[machine_number], machine_names[machine_number]};
@@ -80,12 +79,13 @@ void machine_task(
   }
 
   std::cout << "Machine " << machine_number << " creating iteration object." << std::endl;
+
   
   using IterMethod = AsynchronousIterative<DLMCProcessor<double>, PublishOnLinfShift<double>,
                                            StopAfterTime, TrivialResiliencePolicy>;
   Waiter<IterMethod> iter_waiter =
     WaiterBuilder<IterMethod>(manager_handle, job, tag_ids[machine_number], tag_ids)
-    .set_processor(machine_number, static_cast<int>((tag_ids.size())), local_partition, iteration_num)
+    .set_processor(machine_number, size_of_network, iteration_num)
     .set_publish_policy(1e-6)
     .set_stop_policy(std::chrono::seconds(5))
     .set_resilience_policy()
@@ -159,17 +159,6 @@ int main(int argc, char* argv[])
       return -1;
     }
   }();
-  std::string matrix_name = [&]() {
-    try
-    {
-      return argv[4];
-    }
-    catch (...)
-    {
-      char *hold ;
-      return hold;
-    }
-  }();
   
   if (machine_number < 0 || machine_number >= size_of_network)
   {
@@ -186,16 +175,15 @@ int main(int argc, char* argv[])
     return -1;
   }
 
-  std::string directory = argv[6];
-  int trial = std::stoi(argv[7]);
-  std::string save_directory = argv[8];
+  int epsilon = std::stoi(argv[4]);
+  int iteration_num = std::stoi(argv[5]);
   //This creates the relevant vectors needed to interact with skywing.
   auto ports = set_port(starting_port_number, size_of_network);
   auto machine_names = obtain_machine_names(size_of_network);
   std::vector<std::string> tag_ids = obtain_tag_ids(size_of_network);
 
   // Skywing call
- // machine_task(machine_number, trial, A_partition,  ports, machine_names, tag_ids, save_directory);
+ machine_task(machine_number, size_of_network, epsilon,iteration_num,ports, machine_names, tag_ids);
 
   return 0;
 }

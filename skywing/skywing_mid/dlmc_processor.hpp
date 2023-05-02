@@ -26,18 +26,16 @@ public:
   /**
    */
   DLMCProcessor(
-    int machine_number,
     int size_of_network,
-    std::vector<std::vector<element_t>> local_partition,
     std::size_t iteration_num)
-    : T_(iteration_num), 
-    row_(machine_number), 
+    : 
+    T_(iteration_num), 
     num_nbrs_(size_of_network - 1),
+    local_partition_(std::normal_distribution<double> d{10,0};),
     sigma_(10), 
     theta_(101, 0.0), 
     gradient_(101, 1.0), 
     epsilon_(100), 
-    local_partition_(local_partition),
     mailbox_(2, 0.0), 
     publish_values_(4, 0.0)
   {
@@ -139,7 +137,7 @@ private:
    */
   void dlmc_computation()
   {
-    double local_mean = local_partition_[row_][T_-1];
+    double local_mean = local_partition_[T_-1];
     std::vector<double> n_error = getDistribution(0, (epsilon_/T_), 1);
     theta_[T_] = mailbox_[0] + ((epsilon_/T_) / 2) * 
                     (grad_log_like(mailbox_[0], theta_[T_-1], sigma_) + (num_nbrs_) * mailbox_[1]) + n_error[0];
@@ -150,12 +148,11 @@ private:
 
   std::vector<double> gradient_;
   std::vector<double> theta_;
-  std::vector<std::vector<element_t>> local_partition_;
+  std::vector<double> local_partition_;
   double num_nbrs_;
   size_t sigma_;
   size_t T_;
   size_t epsilon_;
-  int row_;
 
   // Variables internal to this class.
   std::vector<element_t> mailbox_;
