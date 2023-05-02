@@ -63,6 +63,10 @@ void machine_task(
     std::vector<std::string> tag_ids)
 {
 
+  std::cout << machine_number << std::endl;
+  print_vec<std::uint16_t>(ports)
+  print_vec<std::string>(machine_names)
+ 
   skywing::Manager manager{ports[machine_number], machine_names[machine_number]};
 
   std::cout << "Got HERE" << std::endl;
