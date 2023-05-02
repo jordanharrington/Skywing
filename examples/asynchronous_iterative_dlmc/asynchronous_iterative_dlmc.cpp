@@ -9,7 +9,7 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
-#include <math>
+#include <cmath>
 
 #include "skywing_core/enable_logging.hpp"
 
