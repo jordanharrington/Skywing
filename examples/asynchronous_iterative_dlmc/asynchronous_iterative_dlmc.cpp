@@ -159,7 +159,7 @@ int main(const int argc, const char* const argv[])
   std::mt19937 gen((std::random_device())());
   std::normal_distribution<double> nd(0, 10);
   std::vector<double> distribution;
-  initial_dist.reserve(distribution);
+  distribution.reserve(numberOfValues);
   while(numberOfValues-- > 0){distribution.push_back(nd(gen));}
   
   const auto value = 0;
