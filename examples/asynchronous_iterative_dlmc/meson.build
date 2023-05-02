@@ -5,7 +5,7 @@ config = configure_file(
 )
 
 async_iterative = executable(
-  'asynchronous_iterative_dlmc',
+  'asynchronous_iterative',
   ['asynchronous_iterative_dlmc.cpp'],
   dependencies : [skywing_core_dep]
 )
