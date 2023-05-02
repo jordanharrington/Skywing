@@ -51,7 +51,7 @@ template<typename Callable>
 void asynchronous_iterative(
   const MachineConfig& config,
   const std::unordered_map<std::string, MachineConfig>& machines,
-  const double initial_value,
+  const std::vector<double> initial_value,
   Callable act_on)
 {
   skywing::Manager manager(config.port, config.name);
@@ -156,18 +156,17 @@ int main(const int argc, const char* const argv[])
 
   int numberOfValues = 100;
   std::mt19937 gen((std::random_device())());
-  std::normal_distribution<double> nd(x_mu, x_sigma);
+  std::normal_distribution<double> nd(0, 10);
   std::vector<double> initial_dist;
   initial_dist.reserve(numberOfValues);
   while(numberOfValues-- > 0){initial_dist.push_back(nd(gen));}
 
   const double init_theta = 0.0;
   const double init_grad = 1.0;
-
- std::vector<double> values{init_theta, init_grad};
+  const std::vector<double> values{init_theta, init_grad};
 
   std::cout << machine_name << ": Own value is " << '\n';
-  print_vec<std::double>(values);
+  for (double i: values) {std::cout << i << ' ';}
 
   asynchronous_iterative(
     config_iter->second,
