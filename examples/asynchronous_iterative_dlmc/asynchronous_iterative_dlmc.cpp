@@ -111,8 +111,8 @@ void asynchronous_iterative(
     }
     // Cache previous values seen to feed to the callable function
     std::unordered_map<std::string, std::tuple<double,double>> neighbor_values;
-    std::tuple<double,double>& own_value = initial_value;
-    job.publish_tuple(config.tags_produced.front(), own_value);
+    std::tuple<double,double> own_value = initial_value;
+    job.publish_tuple(config.tags_produced.front(), std::make_tuple(std::get<0>(own_value), std::get<1>(own_value)));
     std::ranlux48 prng{std::random_device{}()};
     while (true) {
       // Gather data from subscriptions
