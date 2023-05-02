@@ -187,8 +187,6 @@ int main(const int argc, const char* const argv[])
   distribution.reserve(numberOfValues);
   while(numberOfValues-- > 0){distribution.push_back(nd(gen));}
 
-  std::tuple<double> test= std::make_tuple(0.0, 1.0);
-
   auto value = std::make_tuple(0.0, 1.0);
   std::cout << machine_name << ": Own value is " << std::get<0>(value) << std::get<1>(value) << '\n';
 
