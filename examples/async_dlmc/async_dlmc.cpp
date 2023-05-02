@@ -63,9 +63,9 @@ void machine_task(
     std::vector<std::string> tag_ids)
 {
 
-  std::cout << "HERE" << std::endl;
+  std::cout << machine_number << std::endl;
+
   skywing::Manager manager{ports[machine_number], machine_names[machine_number]};
-  std::cout << "HERE2" << std::endl;
 
   manager.submit_job("job", [&](skywing::Job& job, ManagerHandle manager_handle) {
 
