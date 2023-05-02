@@ -51,8 +51,8 @@ template<typename Callable>
 void asynchronous_iterative(
   const MachineConfig& config,
   const std::unordered_map<std::string, MachineConfig>& machines,
-  const std::vector<double> initial_value,
-  Callable act_on)
+  const std::vector<double> initial_value)
+  //Callable act_on)
 {
   skywing::Manager manager(config.port, config.name);
   if (config.tags_produced.empty()) {
@@ -111,7 +111,7 @@ void asynchronous_iterative(
             return value.second;
           });
         bool should_exit = false;
-        std::tie(own_value, should_exit) = act_on(own_value, other_values);
+        // std::tie(own_value, should_exit) = act_on(own_value, other_values);
         job.publish(config.tags_produced.front(), own_value);
         if (should_exit) { break; }
       }
@@ -172,12 +172,12 @@ int main(const int argc, const char* const argv[])
   asynchronous_iterative(
     config_iter->second,
     configurations,
-    values,
-    [iter = 0](const std::vector<double>& self_value, const std::vector<double>& other_values) mutable {
-      constexpr int num_iters = 5'000;
-      const std::vector<double> new_value;
-        = std::accumulate(other_values.cbegin(), other_values.cend(), self_value) / (other_values.size() + 1);
-      ++iter;
-      return std::make_pair(new_value, iter > num_iters);
-    });
+    values
+    // [iter = 0](const std::vector<double>& self_value, const std::vector<double>& other_values) mutable {
+    //   constexpr int num_iters = 5'000;
+    //   const std::vector<double> new_value;
+    //     = std::accumulate(other_values.cbegin(), other_values.cend(), self_value) / (other_values.size() + 1);
+    //   ++iter;
+    //   return std::make_pair(new_value, iter > num_iters);
+    );
 }
