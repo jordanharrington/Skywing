@@ -32,6 +32,7 @@ kill_progs() {
 echo -e Asyn DLMC: number of distribution divisions: ${size_of_network} '\t'  real theta: 10
 
 for (( counter_for_iterations = 1 ; counter_for_iterations <= number_of_iterations ; counter_for_iterations++ ))
+  echo welp
 do
   for (( counter_for_network_elements=0 ;  counter_for_network_elements < size_of_network ; counter_for_network_elements++ ))
   do
