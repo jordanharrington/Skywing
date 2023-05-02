@@ -64,8 +64,8 @@ void machine_task(
 {
 
   std::cout << machine_number << std::endl;
-  print_vec<std::uint16_t>(ports)
-  print_vec<std::string>(machine_names)
+  print_vec<std::uint16_t>(ports);
+  print_vec<std::string>(machine_names);
  
   skywing::Manager manager{ports[machine_number], machine_names[machine_number]};
 
