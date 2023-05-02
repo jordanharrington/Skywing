@@ -1,6 +1,7 @@
 subdir('hello_world')
 subdir('admm')
 subdir('asynchronous_iterative')
+subdir('asynchronous_iterative_dlmc')
 
 if build_lc_examples
    subdir('lc_hello_world')
