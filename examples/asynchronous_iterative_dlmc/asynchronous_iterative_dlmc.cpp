@@ -134,7 +134,7 @@ void asynchronous_iterative(
       else {
         std::vector<std::vector<double>> other_values;
         std::transform(
-          neighbor_values.cbegin(), neighbor_values.cend(), std::back_inserter(other_values), [](const auto& value) {
+          neighbor_values.cbegin(), neighbor_values.cend(), std::back_inserter(other_values), [](const auto value) {
             return value;
           });
         bool should_exit = false;
