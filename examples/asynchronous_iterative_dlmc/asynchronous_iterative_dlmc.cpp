@@ -132,9 +132,9 @@ void asynchronous_iterative(
         if (should_exit) { break; }
       }
       else {
-        std::vector<std::vector<double>> other_values;
+        std::vector<std::vector<double>> other_values);
         for (auto value : neighbor_values){
-          other_values.push_back(value);
+          other_values.push_back(value[1]);
         }
         // std::transform(
         //   neighbor_values.cbegin(), neighbor_values.cend(), std::back_inserter(other_values), [](const auto value) {
