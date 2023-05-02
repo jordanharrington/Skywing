@@ -51,7 +51,7 @@ template<typename Callable>
 void asynchronous_iterative(
   const MachineConfig& config,
   const std::unordered_map<std::string, MachineConfig>& machines,
-  const std::vector<double> initial_value,
+  const double initial_value,
   Callable act_on)
 {
   skywing::Manager manager(config.port, config.name);
@@ -84,7 +84,7 @@ void asynchronous_iterative(
     }
     // Cache previous values seen to feed to the callable function
     std::unordered_map<std::string, double> neighbor_values;
-    std::vector<double> own_value = initial_value;
+    double own_value = initial_value;
     job.publish(config.tags_produced.front(), own_value);
     std::ranlux48 prng{std::random_device{}()};
     while (true) {
@@ -111,7 +111,7 @@ void asynchronous_iterative(
             return value.second;
           });
         bool should_exit = false;
-        // std::tie(own_value, should_exit) = act_on(own_value, other_values);
+        std::tie(own_value, should_exit) = act_on(own_value, other_values);
         job.publish(config.tags_produced.front(), own_value);
         if (should_exit) { break; }
       }
@@ -119,8 +119,7 @@ void asynchronous_iterative(
       const auto sleep_ms = std::uniform_int_distribution<int>{1, 5}(prng);
       std::this_thread::sleep_for(std::chrono::milliseconds(sleep_ms));
     }
-    std::cout << config.name << ": Final value is " << '\n';
-    for (double i: own_value) {std::cout << i << ' ';}
+    std::cout << config.name << ": Final value is " << own_value << '\n';
   });
   manager.run();
 }
@@ -161,26 +160,18 @@ int main(const int argc, const char* const argv[])
   std::vector<double> initial_dist;
   initial_dist.reserve(numberOfValues);
   while(numberOfValues-- > 0){initial_dist.push_back(nd(gen));}
-
-  const double init_theta = 0.0;
-  const double init_grad = 1.0;
-  const std::vector<double> values{init_theta, init_grad};
-
-  std::cout << machine_name << ": Own value is " << '\n';
-  for (double i: values) {std::cout << i << ' ';}
-
+  
+  const auto value = 0;
+  std::cout << machine_name << ": Own value is " << value << '\n';
   asynchronous_iterative(
     config_iter->second,
     configurations,
-    values,
-    [iter = 0](const std::vector<double>& self_value, const std::vector<double>& other_values) mutable {
+    value,
+    [iter = 0](const double& self_value, const std::vector<double>& other_values) mutable {
       constexpr int num_iters = 5'000;
-      return num_iters;
-    // [iter = 0](const std::vector<double>& self_value, const std::vector<double>& other_values) mutable {
-    //   constexpr int num_iters = 5'000;
-    //   const std::vector<double> new_value;
-    //     = std::accumulate(other_values.cbegin(), other_values.cend(), self_value) / (other_values.size() + 1);
-    //   ++iter;
-    //   return std::make_pair(new_value, iter > num_iters);
+      const auto new_value
+        = std::accumulate(other_values.cbegin(), other_values.cend(), self_value) / (other_values.size() + 1);
+      ++iter;
+      return std::make_pair(new_value, iter > num_iters);
     });
 }
