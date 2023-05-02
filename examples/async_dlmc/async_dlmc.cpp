@@ -65,7 +65,11 @@ void machine_task(
 
   skywing::Manager manager{ports[machine_number], machine_names[machine_number]};
 
+  std::cout << "GOT HERE " << std::endl;
+
   manager.submit_job("job", [&](skywing::Job& job, ManagerHandle manager_handle) {
+
+    std::cout << "GOT HERE2 " << std::endl;
 
   if (machine_number != static_cast<int>((ports.size()) - 1) )
   {
@@ -180,8 +184,6 @@ int main(int argc, char* argv[])
   auto ports = set_port(starting_port_number, size_of_network);
   auto machine_names = obtain_machine_names(size_of_network);
   std::vector<std::string> tag_ids = obtain_tag_ids(size_of_network);
-
-  std::cout << "GOT HERE " << std::endl;
 
   // Skywing call
  machine_task(machine_number, size_of_network, iteration_num, ports, machine_names, tag_ids);
