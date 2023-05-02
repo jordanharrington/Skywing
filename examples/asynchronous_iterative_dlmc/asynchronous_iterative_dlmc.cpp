@@ -117,7 +117,7 @@ void asynchronous_iterative(
     while (true) {
       // Gather data from subscriptions
       for (const auto& sub_tag : config.tags_to_subscribe_to) {
-        if (job.has_data(sub_tag)) { neighbor_values[sub_tag.id()] = *job.get_waiter(sub_tag).get(); }
+        if (job.has_data(sub_tag)) { neighbor_values[sub_tag.id()] = std::make_tuple(*job.get_waiter(sub_tag).get()); }
       }
       // Only call the function if there's any data that's been seen
       if (neighbor_values.empty()) {
