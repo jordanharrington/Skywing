@@ -36,8 +36,8 @@ do
     echo -e welp
     for (( counter_for_network_elements=0 ;  counter_for_network_elements < size_of_network ; counter_for_network_elements++ ))
     do
-    "@async_dlmc_exe@" ${counter_for_network_elements} ${STARTING_PORT} ${size_of_network} ${counter_for_iterations} &
-    declare "erase${counter_for_network_elements}=$!"
+      "@async_dlmc_exe@" ${counter_for_network_elements} ${STARTING_PORT} ${size_of_network} ${counter_for_iterations} &
+      declare "erase${counter_for_network_elements}=$!"
     done
     sleep 10
     kill_progs

@@ -89,7 +89,7 @@ void machine_task(
     .set_stop_policy(std::chrono::seconds(5))
     .set_resilience_policy()
     .build_waiter();
-    
+
   std::cout << "Machine " << machine_number << " about to get iteration object." << std::endl;
   IterMethod async_dlmc = iter_waiter.get();
                                        
@@ -180,6 +180,8 @@ int main(int argc, char* argv[])
   auto ports = set_port(starting_port_number, size_of_network);
   auto machine_names = obtain_machine_names(size_of_network);
   std::vector<std::string> tag_ids = obtain_tag_ids(size_of_network);
+
+  std::cout << "GOT HERE " << std::endl;
 
   // Skywing call
  machine_task(machine_number, size_of_network, iteration_num, ports, machine_names, tag_ids);
