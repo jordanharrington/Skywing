@@ -187,7 +187,7 @@ int main(const int argc, const char* const argv[])
               const std::vector<std::vector<double>>& other_values, 
               const std::vector<double>& distribution
               ) mutable {
-      constexpr int num_iters = 500;
+      constexpr int num_iters = 1500;
       double v_j = 0.0, g_j = 0.0, num_nbrs = 0.0, sigma = 10.0;
       for(std::vector<double> nbr_val : other_values) {v_j+=nbr_val[0]; g_j+=nbr_val[1]; ++num_nbrs;}
       std::vector<double> n_error = getDistribution(0, (100/iter), 1);
