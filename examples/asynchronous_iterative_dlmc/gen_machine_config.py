@@ -2,13 +2,19 @@ import sys
 
 def generate_machines():
     config = open("configuration.cfg", "w")
+    if (float(sys.argv[2]) < 0.1) or (float(sys.argv[2]) >= 1.0):
+        print('Alpha must be between 0.1 inclusive and 1 non-inclusive')
+        return
     for i in range(1, int(sys.argv[1]) + 1):
         config.writelines("machine{}\n".format(i))
         config.writelines("127.0.0.1\n")
         config.writelines("{}\n".format(1000 + ((i-1)* 100)))
         config.writelines("tag {}\n".format(i))
         config.writelines("-\n")
-        for x in range(1, int(sys.argv[1]) + 1):
+        bound = int(float(sys.argv[2])*int(sys.argv[1]))
+        close_neighbors = range(i-bound,i+bound+1)
+        possible_subscription = [x for x in close_neighbors if x > 0]
+        for x in possible_subscription:
             if x != i:
                 config.writelines("tag {}\n".format(x))
         config.writelines("-\n")
