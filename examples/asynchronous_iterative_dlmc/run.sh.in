@@ -2,7 +2,7 @@
 
 trap kill_progs EXIT
 kill_progs() {
-  for i in {1..49}; do
+  for i in {1..5}; do
     var="erase${i}"
     kill -9 ${!var} > /dev/null 2> /dev/null
   done
@@ -12,14 +12,14 @@ kill_progs() {
 cfg="$(dirname "@exe@")/config.cfg"
 
 
-for i in {1..49}; do
+for i in {1..5}; do
   "@exe@" "${cfg}" "machine${i}" &
   declare "waitfor${i}=$!"
 done
 
-"@exe@" "${cfg}" machine50 
+"@exe@" "${cfg}" machine6 
 
-for i in {1..49}; do
+for i in {1..5}; do
   var="waitfor${i}"
   wait ${!var}
 done
