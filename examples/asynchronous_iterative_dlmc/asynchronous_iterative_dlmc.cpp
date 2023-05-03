@@ -132,9 +132,7 @@ void asynchronous_iterative(
         std::vector<std::vector<double>> other_values;
         for (auto value : neighbor_values){ other_values.push_back(value.second); }
         bool should_exit = false;
-        std::ofstream outfile;
-        outfile.open("output.txt", std::ios_base::app);
-        std::tie(own_value, should_exit) = act_on(own_value, other_values, distribution, config.name, outfile);
+        std::tie(own_value, should_exit) = act_on(own_value, other_values, distribution, config.name);
         job.publish(config.tags_produced.front(), own_value);
         if (should_exit) { break; }
       }
@@ -190,7 +188,6 @@ int main(const int argc, const char* const argv[])
               const std::vector<std::vector<double>>& other_values, 
               const std::vector<double>& distribution,
               const std::string machine_name,
-              std::ofstream outfile
               ) mutable {
       constexpr int num_iters = 50;
       double v_j = 0.0, g_j = 0.0, num_nbrs = 0.0, sigma = 10.0;
