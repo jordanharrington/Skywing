@@ -173,8 +173,9 @@ int main(const int argc, const char* const argv[])
     std::cerr << "Could not find configuration for machine \"" << machine_name << "\"\n";
     return 1;
   }
+
   std::vector<double> distribution = getDistribution(0, 10, 100); 
-  auto value = std::vector<double>{0.0, 1.0};
+  auto value = std::vector<double>{4.0, 1.0};
   std::cout << machine_name << ": Own value is mu=" << value[0] << " and gradient="<< value[1] << '\n';
 
   asynchronous_iterative(
@@ -187,7 +188,7 @@ int main(const int argc, const char* const argv[])
               const std::vector<double>& distribution
               ) mutable {
       constexpr int num_iters = 5000;
-      double v_j = 0.0, g_j = 0.0, num_nbrs = 0.0, sigma = 10.0;
+      double v_j = 4.0, g_j = 1.0, num_nbrs = 0.0, sigma = 10.0;
       for(std::vector<double> nbr_val : other_values) {v_j+=nbr_val[0]; g_j+=nbr_val[1]; ++num_nbrs;}
       std::vector<double> n_error = getDistribution(0, (100/iter), 1);
       v_j = (v_j / num_nbrs);
