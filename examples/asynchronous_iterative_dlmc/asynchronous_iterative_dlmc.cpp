@@ -73,7 +73,7 @@ double grad_log_like
 template<typename Callable>
 void asynchronous_iterative(
   const MachineConfig& config,
-  const auto subcription_time,
+  const int subcription_time,
   const std::unordered_map<std::string, MachineConfig>& machines,
   const std::vector<double> distribution,
   const std::vector<double> initial_value,
@@ -174,7 +174,7 @@ int main(const int argc, const char* const argv[])
     std::cerr << "Could not find configuration for machine \"" << machine_name << "\"\n";
     return 1;
   }
-  const auto subcription_time = std::stoi(argv[3]);
+  const int subcription_time = std::stoi(argv[3]);
   std::vector<double> distribution = getDistribution(0, 10, 100); 
   auto value = std::vector<double>{0.0, 1.0};
   std::cout << machine_name << ": Own value is mu=" << value[0] << " and gradient="<< value[1] << '\n';
