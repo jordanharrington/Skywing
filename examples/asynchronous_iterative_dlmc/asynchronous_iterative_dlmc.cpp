@@ -174,7 +174,7 @@ int main(const int argc, const char* const argv[])
     std::cerr << "Could not find configuration for machine \"" << machine_name << "\"\n";
     return 1;
   }
-  const auto subcription_time = int(argv[3]);
+  const auto subcription_time = std::stoi(argv[3]);
   std::vector<double> distribution = getDistribution(0, 10, 100); 
   auto value = std::vector<double>{0.0, 1.0};
   std::cout << machine_name << ": Own value is mu=" << value[0] << " and gradient="<< value[1] << '\n';
