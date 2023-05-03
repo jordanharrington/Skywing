@@ -102,7 +102,7 @@ void asynchronous_iterative(
     job.declare_publication_intent_range(config.tags_produced);
     // Subscribe to all the relevant tags
     auto fut = job.subscribe_range(config.tags_to_subscribe_to);
-    if (!fut.wait_for(std::chrono::seconds(10))) {
+    if (!fut.wait_for(std::chrono::seconds(60))) {
       std::cerr << config.name << ": Took too long to subscribe to tags\n";
       std::exit(1);
     }
@@ -174,7 +174,7 @@ int main(const int argc, const char* const argv[])
     return 1;
   }
 
-  std::vector<double> distribution = getDistribution(4, 10, 100); 
+  std::vector<double> distribution = getDistribution(300, 10, 100); 
   auto value = std::vector<double>{0.0, 1.0};
   std::cout << machine_name << ": Own value is mu=" << value[0] << " and gradient="<< value[1] << '\n';
 
@@ -187,7 +187,7 @@ int main(const int argc, const char* const argv[])
               const std::vector<std::vector<double>>& other_values, 
               const std::vector<double>& distribution
               ) mutable {
-      constexpr int num_iters = 800;
+      constexpr int num_iters = 50;
       double v_j = 0.0, g_j = 0.0, num_nbrs = 0.0, sigma = 10.0;
       for(std::vector<double> nbr_val : other_values) {v_j+=nbr_val[0]; g_j+=nbr_val[1]; ++num_nbrs;}
       std::vector<double> n_error = getDistribution(0, (100/iter), 1);
