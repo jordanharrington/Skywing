@@ -8,17 +8,8 @@ kill_progs() {
   done
 }
 
-network_size=$1
-neighborhood_size=$2
-
-echo -e ${network_size} ${neighborhood_size}
-
-python3 ../../../examples/asynchronous_iterative_dlmc/gen_machine_config.py ${network_size} ${neighborhood_size}
-cp ../../../examples/asynchronous_iterative_dlmc/config.cfg .
-
 # Horrible hack due to Meson not really supporting this
 cfg="$(dirname "@exe@")/config.cfg"
-
 
 for i in {1..5}; do
   "@exe@" "${cfg}" "machine${i}" &

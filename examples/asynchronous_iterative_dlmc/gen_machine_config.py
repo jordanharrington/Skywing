@@ -1,7 +1,7 @@
 import sys
 
 def generate_machines():
-    config = open("../build/examples/asynchronous_iterative_dlmc/config.cfg", "w")
+    config = open("config.cfg", "w")
     if (float(sys.argv[2]) < 0.1) or (float(sys.argv[2]) > 1.0):
         print('Alpha must be between 0.1 and 1 inclusive')
         return

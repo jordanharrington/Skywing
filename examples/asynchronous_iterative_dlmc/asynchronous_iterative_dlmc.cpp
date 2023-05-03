@@ -132,7 +132,9 @@ void asynchronous_iterative(
         std::vector<std::vector<double>> other_values;
         for (auto value : neighbor_values){ other_values.push_back(value.second); }
         bool should_exit = false;
-        std::tie(own_value, should_exit) = act_on(own_value, other_values, distribution);
+        std::ofstream outfile;
+        outfile.open("output.txt", std::ios_base::app);
+        std::tie(own_value, should_exit) = act_on(own_value, other_values, distribution, config.name, outfile);
         job.publish(config.tags_produced.front(), own_value);
         if (should_exit) { break; }
       }
@@ -176,6 +178,7 @@ int main(const int argc, const char* const argv[])
 
   std::vector<double> distribution = getDistribution(300, 10, 100); 
   auto value = std::vector<double>{0.0, 1.0};
+
   std::cout << machine_name << ": Own value is mu=" << value[0] << " and gradient="<< value[1] << '\n';
 
   asynchronous_iterative(
@@ -185,7 +188,9 @@ int main(const int argc, const char* const argv[])
     value,
     [iter = 1](const std::vector<double>& self_value, 
               const std::vector<std::vector<double>>& other_values, 
-              const std::vector<double>& distribution
+              const std::vector<double>& distribution,
+              const std::string machine_name,
+              std::ofstream outfile
               ) mutable {
       constexpr int num_iters = 50;
       double v_j = 0.0, g_j = 0.0, num_nbrs = 0.0, sigma = 10.0;
@@ -195,6 +200,7 @@ int main(const int argc, const char* const argv[])
       g_j = (g_j / num_nbrs);
       const auto new_value_theta = v_j + (((100/iter)/2) * (grad_log_like(v_j, self_value[0], sigma) + (num_nbrs * g_j))) + n_error[0];
       const auto new_value_grad = grad_log_like(distribution[iter-1], new_value_theta, sigma);
+      outfile << "\ndata," << machine_name << "," << new_value_theta << "," << new_value_grad << "," << iter << "\n";
       ++iter;
       return std::make_pair(std::vector<double>{new_value_theta,new_value_grad}, iter > num_iters);
     });
