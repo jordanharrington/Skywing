@@ -2,7 +2,7 @@
 
 trap kill_progs EXIT
 kill_progs() {
-  for i in 1 2 3 4; do
+  for i in {1..49}; do
     var="erase${i}"
     kill -9 ${!var} > /dev/null 2> /dev/null
   done
@@ -11,14 +11,14 @@ kill_progs() {
 # Horrible hack due to Meson not really supporting this
 cfg="$(dirname "@exe@")/configuration.cfg"
 
-for i in 1 2 3 4; do
+for i in {1..49}; do
   "@exe@" "${cfg}" "machine${i}" &
   declare "waitfor${i}=$!"
 done
 
-"@exe@" "${cfg}" machine5
+"@exe@" "${cfg}" machine50
 
-for i in 1 2 3 4; do
+for i in {1..49}; do
   var="waitfor${i}"
   wait ${!var}
 done

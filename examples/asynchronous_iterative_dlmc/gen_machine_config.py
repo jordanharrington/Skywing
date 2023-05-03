@@ -3,7 +3,7 @@ import sys
 def generate_machines():
     config = open("configuration.cfg", "w")
     for i in range(1, int(sys.argv[1]) + 1):
-        config.writelines("machine{}\n".format(1))
+        config.writelines("machine{}\n".format(i))
         config.writelines("127.0.0.1\n")
         config.writelines("{}\n".format(1000 + ((i-1)* 100)))
         config.writelines("tag {}\n".format(i))
