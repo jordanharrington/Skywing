@@ -102,7 +102,7 @@ void asynchronous_iterative(
     job.declare_publication_intent_range(config.tags_produced);
     // Subscribe to all the relevant tags
     auto fut = job.subscribe_range(config.tags_to_subscribe_to);
-    if (!fut.wait_for(std::chrono::seconds(60))) {
+    if (!fut.wait_for(std::chrono::seconds(10))) {
       std::cerr << config.name << ": Took too long to subscribe to tags\n";
       std::exit(1);
     }
