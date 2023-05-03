@@ -1,6 +1,6 @@
 config = configure_file(
-  input : 'configuration.cfg',
-  output : 'configuration.cfg',
+  input : 'config.cfg',
+  output : 'config.cfg',
   copy : true
 )
 
