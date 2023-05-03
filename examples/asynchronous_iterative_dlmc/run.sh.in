@@ -11,15 +11,13 @@ kill_progs() {
 # Horrible hack due to Meson not really supporting this
 cfg="$(dirname "@exe@")/config.cfg"
 
-# Scale with netwrok size (in seconds)
-subcription_time=$1
 
 for i in {1..49}; do
-  "@exe@" "${cfg}" "machine${i}" "${subcription_time}" &
+  "@exe@" "${cfg}" "machine${i}" &
   declare "waitfor${i}=$!"
 done
 
-"@exe@" "${cfg}" machine50 "${subcription_time}"
+"@exe@" "${cfg}" machine50 
 
 for i in {1..49}; do
   var="waitfor${i}"

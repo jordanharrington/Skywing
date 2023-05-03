@@ -73,7 +73,6 @@ double grad_log_like
 template<typename Callable>
 void asynchronous_iterative(
   const MachineConfig& config,
-  const int subcription_time,
   const std::unordered_map<std::string, MachineConfig>& machines,
   const std::vector<double> distribution,
   const std::vector<double> initial_value,
@@ -103,7 +102,7 @@ void asynchronous_iterative(
     job.declare_publication_intent_range(config.tags_produced);
     // Subscribe to all the relevant tags
     auto fut = job.subscribe_range(config.tags_to_subscribe_to);
-    if (!fut.wait_for(std::chrono::seconds(subcription_time))) {
+    if (!fut.wait_for(std::chrono::seconds(60))) {
       std::cerr << config.name << ": Took too long to subscribe to tags\n";
       std::exit(1);
     }
@@ -174,14 +173,12 @@ int main(const int argc, const char* const argv[])
     std::cerr << "Could not find configuration for machine \"" << machine_name << "\"\n";
     return 1;
   }
-  const int subcription_time = std::stoi(argv[3]);
   std::vector<double> distribution = getDistribution(0, 10, 100); 
   auto value = std::vector<double>{0.0, 1.0};
   std::cout << machine_name << ": Own value is mu=" << value[0] << " and gradient="<< value[1] << '\n';
 
   asynchronous_iterative(
     config_iter->second,
-    subcription_time,
     configurations,
     distribution,
     value,
