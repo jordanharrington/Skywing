@@ -1,9 +1,9 @@
 import sys
 
 def generate_machines():
-    config = open("configuration.cfg", "w")
-    if (float(sys.argv[2]) < 0.1) or (float(sys.argv[2]) >= 1.0):
-        print('Alpha must be between 0.1 inclusive and 1 non-inclusive')
+    config = open("config.cfg", "w")
+    if (float(sys.argv[2]) < 0.1) or (float(sys.argv[2]) > 1.0):
+        print('Alpha must be between 0.1 and 1 inclusive')
         return
     for i in range(1, int(sys.argv[1]) + 1):
         config.writelines("machine{}\n".format(i))
