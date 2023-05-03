@@ -194,7 +194,7 @@ int main(const int argc, const char* const argv[])
       v_j = (v_j / num_nbrs);
       g_j = (g_j / num_nbrs);
       const auto new_value_theta = v_j + (((100/iter)/2) * (grad_log_like(v_j, self_value[0], sigma) + (num_nbrs * g_j))) + n_error[0];
-      const auto new_value_grad = grad_log_like(distribution[iter-1], self_value[0], sigma);
+      const auto new_value_grad = grad_log_like(distribution[iter-1], new_value_theta, sigma);
       ++iter;
       return std::make_pair(std::vector<double>{new_value_theta,new_value_grad}, iter > num_iters);
     });
