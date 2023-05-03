@@ -73,6 +73,7 @@ double grad_log_like
 template<typename Callable>
 void asynchronous_iterative(
   const MachineConfig& config,
+  const auto subcription_time,
   const std::unordered_map<std::string, MachineConfig>& machines,
   const std::vector<double> distribution,
   const std::vector<double> initial_value,
@@ -102,7 +103,7 @@ void asynchronous_iterative(
     job.declare_publication_intent_range(config.tags_produced);
     // Subscribe to all the relevant tags
     auto fut = job.subscribe_range(config.tags_to_subscribe_to);
-    if (!fut.wait_for(std::chrono::seconds(50))) {
+    if (!fut.wait_for(std::chrono::seconds(subcription_time))) {
       std::cerr << config.name << ": Took too long to subscribe to tags\n";
       std::exit(1);
     }
@@ -130,13 +131,7 @@ void asynchronous_iterative(
       }
       else {
         std::vector<std::vector<double>> other_values;
-        for (auto value : neighbor_values){
-          other_values.push_back(value.second);
-        }
-        // std::transform(
-        //   neighbor_values.cbegin(), neighbor_values.cend(), std::back_inserter(other_values), [](const auto value) {
-        //     return value;
-        //   });
+        for (auto value : neighbor_values){ other_values.push_back(value.second); }
         bool should_exit = false;
         std::tie(own_value, should_exit) = act_on(own_value, other_values, distribution);
         job.publish(config.tags_produced.front(), own_value);
@@ -179,13 +174,14 @@ int main(const int argc, const char* const argv[])
     std::cerr << "Could not find configuration for machine \"" << machine_name << "\"\n";
     return 1;
   }
-
+  const auto subcription_time = int(argv[3]);
   std::vector<double> distribution = getDistribution(0, 10, 100); 
   auto value = std::vector<double>{0.0, 1.0};
   std::cout << machine_name << ": Own value is mu=" << value[0] << " and gradient="<< value[1] << '\n';
 
   asynchronous_iterative(
     config_iter->second,
+    subcription_time,
     configurations,
     distribution,
     value,
