@@ -13,7 +13,7 @@ def generate_machines():
         config.writelines("-\n")
         bound = int(float(sys.argv[2])*int(sys.argv[1]))
         close_neighbors = range(i-bound,i+bound+1)
-        possible_subscription = [x for x in close_neighbors if x > 0]
+        possible_subscription = [x for x in close_neighbors if x > 0 and x <= int(sys.argv[1])]
         for x in possible_subscription:
             if x != i:
                 config.writelines("tag {}\n".format(x))
