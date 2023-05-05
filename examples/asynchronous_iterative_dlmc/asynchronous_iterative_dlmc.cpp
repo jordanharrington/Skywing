@@ -102,6 +102,8 @@ void asynchronous_iterative(
     job.declare_publication_intent_range(config.tags_produced);
     // Subscribe to all the relevant tags
     auto fut = job.subscribe_range(config.tags_to_subscribe_to);
+    // Should adjust seconds value based on number of neighbors for each machine 
+    // i.e. more tags for each machine, more time needed to fully subscribe
     if (!fut.wait_for(std::chrono::seconds(60))) {
       std::cerr << config.name << ": Took too long to subscribe to tags\n";
       std::exit(1);
@@ -130,6 +132,7 @@ void asynchronous_iterative(
       }
       else {
         std::vector<std::vector<double>> other_values;
+        // Collects values from neighboring nodes
         for (auto value : neighbor_values){ other_values.push_back(value.second); }
         bool should_exit = false;
         std::tie(own_value, should_exit) = act_on(own_value, other_values, distribution, config.name);
@@ -174,7 +177,9 @@ int main(const int argc, const char* const argv[])
     return 1;
   }
 
+  // Each node is given a distribution with the same mean value (std = 10 for all)
   std::vector<double> distribution = getDistribution(300, 10, 100); 
+  // Initally each node belives the mean of their distribution is 0 (gradient is initally 1)
   auto value = std::vector<double>{0.0, 1.0};
 
   std::cout << machine_name << ": Own value is mu=" << value[0] << " and gradient="<< value[1] << '\n';
@@ -184,6 +189,7 @@ int main(const int argc, const char* const argv[])
     configurations,
     distribution,
     value,
+    // DLMC Algo from Stochastic Gradient-Based Distributed Bayesian Estimation in Cooperative Sensor Networks
     [iter = 1](const std::vector<double>& self_value, 
               const std::vector<std::vector<double>>& other_values, 
               const std::vector<double>& distribution,
@@ -197,6 +203,7 @@ int main(const int argc, const char* const argv[])
       g_j = (g_j / num_nbrs);
       const auto new_value_theta = v_j + (((100/iter)/2) * (grad_log_like(v_j, self_value[0], sigma) + (num_nbrs * g_j))) + n_error[0];
       const auto new_value_grad = grad_log_like(distribution[iter-1], new_value_theta, sigma);
+      // Output used for graphing outside of skywing. Can be commented out for an easier to read terminal
       std::cout << "\ndata," << machine_name << "," << new_value_theta << "," << new_value_grad << "," << iter << "\n";
       ++iter;
       return std::make_pair(std::vector<double>{new_value_theta,new_value_grad}, iter > num_iters);
