@@ -176,12 +176,10 @@ int main(const int argc, const char* const argv[])
     std::cerr << "Could not find configuration for machine \"" << machine_name << "\"\n";
     return 1;
   }
-
   // Each node is given a distribution with the same mean value (std = 10 for all)
   std::vector<double> distribution = getDistribution(300, 10, 100); 
-  // Initally each node belives the mean of their distribution is 0 (gradient is initally 1)
+  // Initally each node belives the mean of their distribution is 0 and gradient is 1)
   auto value = std::vector<double>{0.0, 1.0};
-
   std::cout << machine_name << ": Own value is mu=" << value[0] << " and gradient="<< value[1] << '\n';
 
   asynchronous_iterative(
@@ -195,17 +193,23 @@ int main(const int argc, const char* const argv[])
               const std::vector<double>& distribution,
               const std::string machine_name
               ) mutable {
+      // Setting max number of iterations
       constexpr int num_iters = 50;
-      double v_j = 0.0, g_j = 0.0, num_nbrs = 0.0, sigma = 10.0;
+      // NOTE: sigma must be identical to that in initial distribution split (main method: around line 101)
+      double v_j = 0.0, g_j = 0.0, num_nbrs = 0.0, sigma = 10.0, epsilon = 100.0;
+      // Aggregating and finding average for neighbor values of theta and gradient
       for(std::vector<double> nbr_val : other_values) {v_j+=nbr_val[0]; g_j+=nbr_val[1]; ++num_nbrs;}
-      std::vector<double> n_error = getDistribution(0, (100/iter), 1);
       v_j = (v_j / num_nbrs);
       g_j = (g_j / num_nbrs);
-      const auto new_value_theta = v_j + (((100/iter)/2) * (grad_log_like(v_j, self_value[0], sigma) + (num_nbrs * g_j))) + n_error[0];
+      // Getting random error value
+      std::vector<double> n_error = getDistribution(0, (epsilon/iter), 1);
+      // local update of theta and gradient values with respect to neighbor values (theta in zero index in self_vlues, gradient is 1)
+      const auto new_value_theta = v_j + (((epsilon/iter)/2) * (grad_log_like(v_j, self_value[0], sigma) + (num_nbrs * g_j))) + n_error[0];
       const auto new_value_grad = grad_log_like(distribution[iter-1], new_value_theta, sigma);
       // Output used for graphing outside of skywing. Can be commented out for an easier to read terminal
       std::cout << "\ndata," << machine_name << "," << new_value_theta << "," << new_value_grad << "," << iter << "\n";
       ++iter;
+      // Publishing new values
       return std::make_pair(std::vector<double>{new_value_theta,new_value_grad}, iter > num_iters);
     });
 }
